@@ -1,0 +1,17 @@
+services:
+  riffload:
+    build: .
+    environment:
+      - DISPLAY=${DISPLAY:-:0}
+    volumes:
+      # X11 socket for GUI display
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      # Music downloads land on your host machine
+      - ${HOME}/Music:/root/Music
+    network_mode: host
+    # Needed for libtorrent to open ports
+    ports: []
+
+# macOS users: Install XQuartz (https://www.xquartz.org), then run:
+#   xhost +localhost
+#   DISPLAY=host.docker.internal:0 docker compose up

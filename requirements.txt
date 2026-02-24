@@ -1,0 +1,11 @@
+# Python dependencies (pip)
+# NOTE: On Linux, PyQt6 and libtorrent should be installed via apt instead.
+#       Run ./install.sh to handle this automatically.
+#
+# For Docker and macOS, all of these can be installed via pip directly.
+PyQt6>=6.4.0
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+# libtorrent is installed via apt on Linux, pip on macOS
+# Docker install is handled in the Dockerfile

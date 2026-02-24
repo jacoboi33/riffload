@@ -1,0 +1,86 @@
+name: Build Releases
+
+on:
+  push:
+    tags:
+      - 'v*'   # triggers on: git tag v0.1.0 && git push --tags
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pyqt6 python3-libtorrent python3-lxml python3-pip
+
+      - name: Install Python dependencies
+        run: pip3 install --break-system-packages pyinstaller requests beautifulsoup4
+
+      - name: Build
+        run: python3 -m PyInstaller riffload.spec --noconfirm --clean
+
+      - name: Package
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          tar -czf riffload-${VERSION}-linux-x86_64.tar.gz -C dist riffload/
+          echo "ASSET=riffload-${VERSION}-linux-x86_64.tar.gz" >> $GITHUB_ENV
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build
+          path: ${{ env.ASSET }}
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install libtorrent-rasterbar create-dmg
+          pip3 install PyQt6 requests beautifulsoup4 lxml libtorrent pyinstaller
+
+      - name: Build
+        run: python3 -m PyInstaller riffload.spec --noconfirm --clean
+
+      - name: Create DMG
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          create-dmg \
+            --volname "Riffload ${VERSION}" \
+            --window-pos 200 120 \
+            --window-size 600 300 \
+            --icon-size 100 \
+            --icon "Riffload.app" 150 150 \
+            --hide-extension "Riffload.app" \
+            --app-drop-link 450 150 \
+            "Riffload-${VERSION}-mac.dmg" \
+            "dist/Riffload.app"
+          echo "ASSET=Riffload-${VERSION}-mac.dmg" >> $GITHUB_ENV
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-build
+          path: ${{ env.ASSET }}
+
+  release:
+    needs: [build-linux, build-macos]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            linux-build/*
+            macos-build/*
+          generate_release_notes: true
