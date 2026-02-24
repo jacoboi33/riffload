@@ -2,63 +2,91 @@
 
 Search for music albums, browse artwork, and download torrents directly to your music folder.
 
-## Quick Start
+![Riffload](assets/logo.png)
+
+---
+
+## Install & Run
+
+### Linux (Ubuntu, Debian, Pop!_OS, Arch, Manjaro, Fedora)
+
+Open a terminal and paste this:
 
 ```bash
-git clone https://github.com/yourname/riffload
+git clone https://github.com/jacoboi33/riffload
 cd riffload
 ./install.sh
-python3 main.py
 ```
 
-## Requirements
-
-- Python 3.10+
-- Linux or macOS
-
-## Installation
-
-### Linux
+Then launch it:
 
 ```bash
-./install.sh
+riffload
 ```
 
-Installs `python3-pyqt6` and `python3-libtorrent` via apt, plus pip packages.
+Or find **Riffload** in your app launcher.
+
+---
 
 ### macOS
 
+Make sure you have [Homebrew](https://brew.sh) installed first, then:
+
 ```bash
+git clone https://github.com/jacoboi33/riffload
+cd riffload
 ./install.sh
 ```
 
-Requires [Homebrew](https://brew.sh). Installs `libtorrent-rasterbar` via brew and everything else via pip.
-
-## Docker
-
-### Linux
+Then launch it:
 
 ```bash
+riffload
+```
+
+> **Note:** If `riffload` isn't found after install, open a new terminal window and try again.
+
+---
+
+### Docker (any OS)
+
+**Linux:**
+```bash
+git clone https://github.com/jacoboi33/riffload
+cd riffload
 xhost +local:docker
 docker compose up --build
 ```
 
-### macOS
-
+**macOS:**
 1. Install [XQuartz](https://www.xquartz.org)
 2. Open XQuartz → Preferences → Security → check **Allow connections from network clients**
 3. Restart XQuartz, then:
 
 ```bash
+git clone https://github.com/jacoboi33/riffload
+cd riffload
 xhost +localhost
 DISPLAY=host.docker.internal:0 docker compose up --build
 ```
 
-Music is saved to `~/Music` on your host machine.
+Music downloads are saved to `~/Music` on your machine.
+
+---
+
+## Requirements
+
+- Git
+- Python 3.10+
+- Linux, macOS, or Docker
+
+---
 
 ## How it works
 
 1. Type an artist or album in the search bar
-2. Album cards appear with artwork (from iTunes catalog)
-3. Click an album → torrent options appear (quality, size, seeders)
+2. Album cards appear with artwork
+3. Click an album → see available torrents (quality, size, seeders)
 4. Click **Download** → saves to `~/Music/`
+
+Searches across: The Pirate Bay, 1337x, Nyaa, TorrentGalaxy, BitSearch, and KickassTorrents — all at the same time.
