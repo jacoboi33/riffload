@@ -2,6 +2,8 @@
 set -e
 
 OS="$(uname -s)"
+INSTALL_DIR="$(cd "$(dirname "$0")" && pwd)"
+BIN_DIR="$HOME/.local/bin"
 
 echo "==> Detected OS: $OS"
 
@@ -29,5 +31,43 @@ else
     exit 1
 fi
 
+# Create a launcher script so you can just run 'riffload' anywhere
+echo "==> Installing riffload command..."
+mkdir -p "$BIN_DIR"
+cat > "$BIN_DIR/riffload" << EOF
+#!/usr/bin/env bash
+exec python3 "$INSTALL_DIR/main.py" "\$@"
+EOF
+chmod +x "$BIN_DIR/riffload"
+
+# Make sure ~/.local/bin is in PATH (add to shell profile if missing)
+for PROFILE in "$HOME/.bashrc" "$HOME/.zshrc"; do
+    if [ -f "$PROFILE" ] && ! grep -q '.local/bin' "$PROFILE"; then
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$PROFILE"
+        echo "==> Added ~/.local/bin to PATH in $PROFILE"
+    fi
+done
+
+# Update the desktop shortcut to use the launcher
+if [ "$OS" = "Linux" ]; then
+    DESKTOP_DIR="$HOME/.local/share/applications"
+    mkdir -p "$DESKTOP_DIR"
+    cat > "$DESKTOP_DIR/riffload.desktop" << EOF
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Riffload
+Comment=Music torrent browser
+Exec=$BIN_DIR/riffload
+Icon=$INSTALL_DIR/assets/icon_256.png
+Terminal=false
+Categories=Network;Audio;
+EOF
+    update-desktop-database "$DESKTOP_DIR" 2>/dev/null || true
+fi
+
 echo ""
-echo "✓ Done. Run with: python3 main.py"
+echo "✓ Done! Run it with:"
+echo "   riffload"
+echo ""
+echo "  (If 'riffload' isn't found yet, open a new terminal or run: source ~/.bashrc)"
